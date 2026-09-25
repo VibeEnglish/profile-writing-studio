@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile Writing Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+    }
+    .badge-star {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    .tab-active {
+      border-bottom: 3px solid #4f46e5;
+      color: #4f46e5;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+            <i class="fa-solid fa-pen-nib text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-xl tracking-tight text-slate-900">My Profile Writing Studio</h1>
+            <div class="flex items-center space-x-2">
+              <span class="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                <i class="fa-solid fa-crown text-[9px] mr-1"></i> UK English Standards
+              </span>
+              <span class="text-xs text-slate-400">• Junior Secondary Edition</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <button id="apiKeyBtn" onclick="toggleApiModal()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center">
+            <i class="fa-solid fa-key mr-1.5 text-indigo-500"></i> API Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- TABS NAVIGATION -->
+      <nav class="flex space-x-8 mt-1">
+        <button onclick="switchTab('studio')" id="tab-studio" class="tab-active py-3 text-sm font-medium transition flex items-center space-x-2">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Drafting Studio</span>
+        </button>
+        <button onclick="switchTab('dictionary')" id="tab-dictionary" class="py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition flex items-center space-x-2">
+          <i class="fa-solid fa-book-bookmark"></i>
+          <span>Target Vocabulary Bank</span>
+        </button>
+        <button onclick="switchTab('portfolio')" id="tab-portfolio" class="py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition flex items-center space-x-2">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>Saved Profile Entries</span>
+          <span id="portfolioCount" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-bold ml-1">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- API KEY MODAL -->
+    <div id="apiModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-lg text-slate-900 flex items-center">
+            <i class="fa-solid fa-gears text-indigo-600 mr-2"></i> API Configuration
+          </h3>
+          <button onclick="toggleApiModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">
+          Provide your Gemini API Key to enable direct live AI evaluation. If no key is provided, the studio uses its built-in evaluation engine logic.
+        </p>
+        <div class="mb-4">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Gemini API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button onclick="saveApiKey()" class="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Save Key</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: DRAFTING STUDIO -->
+    <section id="view-studio" class="space-y-6">
+
+      <!-- STEP SCAFFOLDING GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- INPUT COLUMN -->
+        <div class="lg:col-span-5 space-y-5">
+
+          <!-- PARAMETER 1: TARGET VOCABULARY SELECTION -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center">
+                <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] mr-2">1</span>
+                Select Target Vocabulary
+              </label>
+              <span id="selectedVocabCount" class="text-xs font-medium text-slate-400">0 selected</span>
+            </div>
+
+            <!-- VOCAB ACCORDIONS -->
+            <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+              <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Personality Adjectives</span>
+                <div class="flex flex-wrap gap-1.5" id="vocabGroup1"></div>
+              </div>
+              <div class="pt-2 border-t border-slate-100">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Talking About School Life</span>
+                <div class="flex flex-wrap gap-1.5" id="vocabGroup2"></div>
+              </div>
+              <div class="pt-2 border-t border-slate-100">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Other Vocabulary</span>
+                <div class="flex flex-wrap gap-1.5" id="vocabGroup3"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PARAMETER 2: WRITING FOCUS -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center mb-3">
+              <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] mr-2">2</span>
+              Choose Writing Focus Parameter
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="writingFocus" value="Better Word Choice" checked class="peer sr-only">
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/50 peer-checked:text-indigo-900 transition text-center">
+                  <i class="fa-solid fa-spell-check text-indigo-500 mb-1 block text-base"></i>
+                  <span class="text-xs font-bold block">Better Word Choice</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Upgrade simple vocabulary</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="writingFocus" value="More Detail" class="peer sr-only">
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/50 peer-checked:text-indigo-900 transition text-center">
+                  <i class="fa-solid fa-circle-plus text-indigo-500 mb-1 block text-base"></i>
+                  <span class="text-xs font-bold block">More Detail</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Add time, reasons, actions</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- PARAMETER 3: STUDENT DRAFT SENTENCE -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center mb-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] mr-2">3</span>
+              Student Draft Sentence
+            </label>
+            <textarea id="studentDraftInput" rows="4" placeholder="Enter draft sentence here..." class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none"></textarea>
+            
+            <button id="generateBtn" onclick="processDraft()" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-100 transition flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-bolt text-amber-300"></i>
+              <span>Generate 3-Tier AI Feedback</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- OUTPUT FEEDBACK COLUMN -->
+        <div class="lg:col-span-7">
+          <div id="outputPlaceholder" class="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center flex flex-col items-center justify-center min-h-[480px]">
+            <div class="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 mb-4 text-2xl">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 text-base mb-1">No Entry Evaluated Yet</h3>
+            <p class="text-xs text-slate-500 max-w-sm">Select target vocabulary terms, choose a writing focus parameter, type a draft sentence, and trigger evaluation to generate scaffolded feedback.</p>
+          </div>
+
+          <!-- FEEDBACK TIERS CONTAINER -->
+          <div id="feedbackContainer" class="hidden space-y-4">
+            
+            <div class="flex items-center justify-between bg-indigo-900 text-white p-4 rounded-2xl shadow-md">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-indigo-300 block">Draft Analysis Complete</span>
+                <h4 class="font-bold text-sm">3-Tier Progression Output</h4>
+              </div>
+              <button id="savePortfolioBtn" onclick="saveToPortfolio()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-bookmark"></i>
+                <span>Save to Portfolio</span>
+              </button>
+            </div>
+
+            <!-- TIER 1 -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+              <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-amber-400"></div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-amber-500 font-bold text-sm">★ ONE STAR</span>
+                  <span class="text-xs font-bold text-slate-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">Grammatical Accuracy & Baseline Proofreading</span>
+                </div>
+                <button onclick="speakText('star1')" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Listen Audio">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              </div>
+              <p id="star1-text" class="text-slate-800 font-medium text-sm my-3 leading-relaxed pl-2 border-l-2 border-amber-200"></p>
+              <div class="bg-amber-50/60 rounded-xl p-3 text-xs text-amber-900 border border-amber-100 flex items-start space-x-2">
+                <i class="fa-solid fa-circle-info text-amber-500 mt-0.5"></i>
+                <p id="explain1-text" class="leading-relaxed"></p>
+              </div>
+            </div>
+
+            <!-- TIER 2 -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+              <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-indigo-500"></div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-indigo-600 font-bold text-sm">★★ TWO STARS</span>
+                  <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full" id="star2-badge-focus">Targeted Writing Upgrade</span>
+                </div>
+                <button onclick="speakText('star2')" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Listen Audio">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              </div>
+              <p id="star2-text" class="text-slate-800 font-medium text-sm my-3 leading-relaxed pl-2 border-l-2 border-indigo-200"></p>
+              <div class="bg-indigo-50/60 rounded-xl p-3 text-xs text-indigo-900 border border-indigo-100 flex items-start space-x-2">
+                <i class="fa-solid fa-lightbulb text-indigo-500 mt-0.5"></i>
+                <p id="explain2-text" class="leading-relaxed"></p>
+              </div>
+            </div>
+
+            <!-- TIER 3 -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+              <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-emerald-500"></div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-emerald-600 font-bold text-sm">★★★ THREE STARS</span>
+                  <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Master Polish & Complex Structure</span>
+                </div>
+                <button onclick="speakText('star3')" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Listen Audio">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              </div>
+              <p id="star3-text" class="text-slate-800 font-semibold text-sm my-3 leading-relaxed pl-2 border-l-2 border-emerald-200"></p>
+              <div class="bg-emerald-50/60 rounded-xl p-3 text-xs text-emerald-900 border border-emerald-100 flex items-start space-x-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-emerald-500 mt-0.5"></i>
+                <p id="explain3-text" class="leading-relaxed"></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 2: VOCABULARY DICTIONARY TOOL -->
+    <section id="view-dictionary" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-bold text-slate-900 text-lg">Interactive Target Dictionary</h2>
+            <p class="text-xs text-slate-500">Explore target terms, standard UK spelling, definitions, and pronunciation.</p>
+          </div>
+          <div class="relative w-full md:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+            <input type="text" id="vocabSearch" oninput="filterDictionary()" placeholder="Search terms..." class="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="dictionaryGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SAVED PORTFOLIO VIEW -->
+    <section id="view-portfolio" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="font-bold text-slate-900 text-lg">My Student Portfolio</h2>
+            <p class="text-xs text-slate-500">Review your saved profile entries and scaffolding progressions.</p>
+          </div>
+        </div>
+
+        <div id="portfolioList" class="space-y-6">
+          <!-- Dynamic entries -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // TARGET VOCABULARY DATA
+    const TARGET_VOCABULARY = {
+      personality: [
+        "Adventurous", "Creative", "Kind", "Playful", "Self-assured", "Sporty",
+        "Clumsy", "Friendly", "Outgoing", "Polite", "Shy", "Strict", "Confident",
+        "Independent", "Patient", "Reserved", "Sociable"
+      ],
+      school: [
+        "Be a member of", "Have practice", "Take part in", "Form a study group",
+        "Join", "Have meetings", "Organise social activities"
+      ],
+      other: [
+        "Adversity", "Cope", "Embark on", "Give a hand", "On pins and needles",
+        "School spirit", "Submit", "Assignment", "Counsellor", "Embrace",
+        "Lend an ear", "Overcome", "Scold", "Unsettled", "Boarding school",
+        "Due", "Exchange programme", "On cloud nine", "Prestigious",
+        "Sports complex", "Well-equipped"
+      ]
+    };
+
+    const DICTIONARY_DATA = [
+      { word: "Adventurous", pos: "adj", def: "Willing to take risks or to try out new ideas and experiences.", ex: "She is an adventurous student who loves outdoor activities." },
+      { word: "Creative", pos: "adj", def: "Having or showing an ability to make new things or think of new ideas.", ex: "He takes a creative approach to solving art assignments." },
+      { word: "Kind", pos: "adj", def: "Having or showing a friendly, generous, and considerate nature.", ex: "Our class teacher is always kind to everyone." },
+      { word: "Playful", pos: "adj", def: "Full of fun and high spirits; cheerful and lively.", ex: "The playful secondary school students enjoyed their recess break." },
+      { word: "Self-assured", pos: "adj", def: "Having confidence in one's own abilities or character.", ex: "She presented her topic in a self-assured manner." },
+      { word: "Sporty", pos: "adj", def: "Fond of or good at sport.", ex: "He is very sporty and trains regularly at the sports complex." },
+      { word: "Clumsy", pos: "adj", def: "Awkward in movement or in handling things.", ex: "I felt clumsy while trying to carry all the textbooks." },
+      { word: "Friendly", pos: "adj", def: "Behaving in a pleasant, kindly way towards someone.", ex: "The prefects gave us a friendly welcome on day one." },
+      { word: "Outgoing", pos: "adj", def: "Friendly and socially confident.", ex: "Being outgoing made it easy for her to make new friends." },
+      { word: "Polite", pos: "adj", def: "Having or showing behaviour that is respectful and considerate.", ex: "Always remain polite when speaking with teachers." },
+      { word: "Shy", pos: "adj", def: "Nervous or timid in the company of other people.", ex: "The shy student gradually opened up during team activities." },
+      { word: "Strict", pos: "adj", def: "Demanding total obedience to rules or standards.", ex: "The coach is strict during training sessions." },
+      { word: "Confident", pos: "adj", def: "Feeling or showing certainty about something or one's own abilities.", ex: "He felt confident about submitting his assignment on time." },
+      { word: "Independent", pos: "adj", def: "Not depending on another person or thing for help or support.", ex: "Studying at boarding school helps students become independent." },
+      { word: "Patient", pos: "adj", def: "Able to accept or tolerate delays, problems, or suffering without becoming annoyed.", ex: "The counsellor was patient and listened to my concerns." },
+      { word: "Reserved", pos: "adj", def: "Slow to reveal emotion or opinions; quiet.", ex: "Though reserved, she is an exceptionally observant writer." },
+      { word: "Sociable", pos: "adj", def: "Willing to talk and engage in activities with other people.", ex: "He is a sociable person who enjoys organizing social activities." },
+      { word: "Be a member of", pos: "v phr", def: "To belong to a group, club, or organisation.", ex: "I am proud to be a member of the school choir." },
+      { word: "Have practice", pos: "v phr", def: "To perform an activity regularly to maintain or improve proficiency.", ex: "We have practice every Tuesday at the sports complex." },
+      { word: "Take part in", pos: "v phr", def: "To participate in an activity or event.", ex: "Many students take part in the annual speech festival." },
+      { word: "Form a study group", pos: "v phr", def: "To gather a team of peers to study together.", ex: "We decided to form a study group before examinations." },
+      { word: "Join", pos: "v", def: "To become a member of an association or society.", ex: "She decided to join the debate team." },
+      { word: "Have meetings", pos: "v phr", def: "To meet formally with group members.", ex: "The student council members have meetings every Friday." },
+      { word: "Organise social activities", pos: "v phr", def: "To plan events designed to foster community spirit.", ex: "The committee will organise social activities for new pupils." },
+      { word: "Adversity", pos: "n", def: "A difficult or unpleasant situation.", ex: "She showed remarkable courage in the face of adversity." },
+      { word: "Cope", pos: "v", def: "To deal effectively with something difficult.", ex: "It can be difficult to cope with heavy homework loads." },
+      { word: "Embark on", pos: "v phr", def: "To start something new, significant, or challenging.", ex: "We are ready to embark on our new academic journey." },
+      { word: "Give a hand", pos: "v phr", def: "To assist or help someone.", ex: "Please give a hand with arranging the chairs in the hall." },
+      { word: "On pins and needles", pos: "exp", def: "In a state of anxious or nervous anticipation.", ex: "I was on pins and needles waiting for my exam results." },
+      { word: "School spirit", pos: "n phr", def: "Enthusiasm and loyalty towards one's school.", ex: "Wearing school badges displays great school spirit." },
+      { word: "Submit", pos: "v", def: "To present a document or proposal for consideration or judgment.", ex: "Please submit your essay before the strict deadline." },
+      { word: "Assignment", pos: "n", def: "A piece of work allocated to a student as part of a course of study.", ex: "The English assignment is due next Tuesday." },
+      { word: "Counsellor", pos: "n", def: "A person trained to give guidance on personal or psychological problems.", ex: "The school counsellor is always ready to lend an ear." },
+      { word: "Embrace", pos: "v", def: "To accept or support a belief, theory, or change willingly.", ex: "We should embrace new learning challenges with enthusiasm." },
+      { word: "Lend an ear", pos: "exp", def: "To listen sympathetically to someone.", ex: "A good friend will always lend an ear when you feel unsettled." },
+      { word: "Overcome", pos: "v", def: "To succeed in dealing with a problem or difficulty.", ex: "Through hard work, he managed to overcome his fear of public speaking." },
+      { word: "Scold", pos: "v", def: "To rebuke or reprimand someone angrily.", ex: "Teachers rarely scold pupils if they try their best." },
+      { word: "Unsettled", pos: "adj", def: "Anxious, uneasy, or subject to change.", ex: "Moving to a new school left her feeling temporarily unsettled." },
+      { word: "Boarding school", pos: "n phr", def: "A school where pupils live and study during the school term.", ex: "He learned independence while attending boarding school." },
+      { word: "Due", pos: "adj", def: "Expected at or planned for a certain time.", ex: "The project report is due by 5 p.m. today." },
+      { word: "Exchange programme", pos: "n phr", def: "A program in which students study abroad at a partner institution.", ex: "Participating in an exchange programme broadens your horizons." },
+      { word: "On cloud nine", pos: "exp", def: "Extremely happy or delighted.", ex: "Winning the sports competition put her on cloud nine." },
+      { word: "Prestigious", pos: "adj", def: "Inspiring respect and admiration; having high status.", ex: "Our team was invited to a prestigious academic symposium." },
+      { word: "Sports complex", pos: "n phr", def: "A venue with comprehensive athletic facilities.", ex: "Our school boasts a modern, well-equipped sports complex." },
+      { word: "Well-equipped", pos: "adj", def: "Provided with all the necessary equipment or resources.", ex: "The science laboratory is thoroughly well-equipped." }
+    ];
+
+    // SYSTEM PROMPT TEMPLATE
+    const SYSTEM_PROMPT = `YOU ARE AN ELITE ENGLISH LANGUAGE PROOFREADER, AND THE CORE AI ENGINE FOR "MY PROFILE WRITING STUDIO". YOUR PRIMARY DUTY IS TO GUARANTEE 100% GRAMMATICAL PERFECTION AND ACCURACY ACROSS ALL THREE FEEDBACK TIERS. ZERO GRAMMAR, SPELLING, PUNCTUATION, TENSE, OR SYNTAX ERRORS ARE PERMITTED UNDER ANY CIRCUMSTANCES.
+
+1. SYSTEM CONTEXT & PEDAGOGICAL GOALS:
+- Step 1 (★): Grammatical Accuracy & Baseline Proofreading (UK English)
+- Step 2 (★★): Targeted Writing Upgrade (Word Choice or Detail)
+- Step 3 (★★★): Targeted Writing Upgrade (sentence structure / master polish)
+
+2. TARGET VOCABULARY KNOWLEDGE BASE:
+[PERSONALITY ADJECTIVES] Adventurous, Creative, Kind, Playful, Self-assured, Sporty, Clumsy, Friendly, Outgoing, Polite, Shy, Strict, Confident, Independent, Patient, Reserved, Sociable
+[TALKING ABOUT SCHOOL LIFE] Be a member of, Have practice, Take part in, Form a study group, Join, Have meetings, Organise social activities
+[OTHER VOCABULARY] Adversity, Cope, Embark on, Give a hand, On pins and needles, School spirit, Submit, Assignment, Counsellor, Embrace, Lend an ear, Overcome, Scold, Unsettled, Boarding school, Due, Exchange programme, On cloud nine, Prestigious, Sports complex, Well-equipped
+
+3. MANDATORY ZERO-ERROR UK GRAMMAR CHECKLIST:
+- Subject-Verb Agreement
+- Tense Consistency
+- Articles & Determiners
+- UK Prepositions & Collocations (e.g. at the weekend, cater for, different to/from)
+- Syntax & Modifiers
+- Parallel Structure
+- Pronoun Clarity & Case
+- UK Spelling & Capitalization (-ise, -our, practice/practise)
+- UK Punctuation Mechanics (single quotes '...', omit full stops in Mr/Dr)
+- Redundancy & Native Style
+
+4. TIER OUTPUT SPECIFICATIONS:
+- ★ ONE STAR: Correct draft to flawless UK English. If zero errors, output EXACTLY: "Great job! Your draft has no grammatical errors! [Original Draft]"
+- ★★ TWO STARS: Apply chosen Writing Focus (Better Word Choice OR More Detail) with 100% precision.
+- ★★★ THREE STARS: Restructure into a fluent, complex sentence with sophisticated transitions.
+
+Ensure target vocabulary words are formatted with double asterisks **like this** in all star sentences.
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "star1": "★ One Star sentence with **target words** bolded",
+  "star2": "★★ Two Stars sentence with **target words** bolded",
+  "star3": "★★★ Three Stars sentence with **target words** bolded",
+  "explain1": "Explanation of grammatical corrections made or validation of zero errors.",
+  "explain2": "Explanation of how the chosen Writing Focus parameter was applied.",
+  "explain3": "Explanation of structural and stylistic enhancements made for master expression."
+}`;
+
+    // APP STATE
+    let selectedVocab = [];
+    let currentEvaluation = null;
+    let portfolioEntries = [];
+
+    // INITIALIZATION
+    document.addEventListener("DOMContentLoaded", () => {
+      renderVocabChips();
+      renderDictionary();
+    });
+
+    // VOCAB SELECTION CHIPS
+    function renderVocabChips() {
+      const renderGroup = (containerId, items) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = items.map(word => `
+          <button type="button" onclick="toggleVocab('${word}')" id="chip-${sanitizeId(word)}" class="text-xs px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:border-indigo-300 transition font-medium flex items-center">
+            <span>${word}</span>
+          </button>
+        `).join('');
+      };
+
+      renderGroup("vocabGroup1", TARGET_VOCABULARY.personality);
+      renderGroup("vocabGroup2", TARGET_VOCABULARY.school);
+      renderGroup("vocabGroup3", TARGET_VOCABULARY.other);
+    }
+
+    function sanitizeId(str) {
+      return str.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    function toggleVocab(word) {
+      const index = selectedVocab.indexOf(word);
+      const chip = document.getElementById(`chip-${sanitizeId(word)}`);
+      
+      if (index > -1) {
+        selectedVocab.splice(index, 1);
+        chip.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
+        chip.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200');
+      } else {
+        selectedVocab.push(word);
+        chip.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200');
+        chip.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+      }
+
+      document.getElementById('selectedVocabCount').innerText = `${selectedVocab.length} selected`;
+    }
+
+    // DICTIONARY RENDER & FILTER
+    function renderDictionary(filter = "") {
+      const container = document.getElementById('dictionaryGrid');
+      const filtered = DICTIONARY_DATA.filter(item => 
+        item.word.toLowerCase().includes(filter.toLowerCase()) ||
+        item.def.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      container.innerHTML = filtered.map(item => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">${item.word}</h3>
+              <span class="inline-block text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded uppercase">${item.pos}</span>
+            </div>
+            <button onclick="speakDirect('${item.word.replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-indigo-600 p-1 text-xs">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-2 leading-relaxed">${item.def}</p>
+          <p class="text-[11px] text-slate-500 italic bg-white p-2 rounded border border-slate-100">"${item.ex}"</p>
+        </div>
+      `).join('');
+    }
+
+    function filterDictionary() {
+      const query = document.getElementById('vocabSearch').value;
+      renderDictionary(query);
+    }
+
+    // TAB SWITCHING
+    function switchTab(tab) {
+      ['studio', 'dictionary', 'portfolio'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove('tab-active');
+        document.getElementById(`tab-${t}`).classList.add('text-slate-500');
+      });
+
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).classList.add('tab-active');
+      document.getElementById(`tab-${tab}`).classList.remove('text-slate-500');
+    }
+
+    // API KEY MODAL
+    function toggleApiModal() {
+      document.getElementById('apiModal').classList.toggle('hidden');
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('studio_gemini_key', key);
+      toggleApiModal();
+      alert(key ? "API key saved!" : "Cleared stored API key.");
+    }
+
+    // PROCESS DRAFT
+    async function processDraft() {
+      const draftText = document.getElementById('studentDraftInput').value.trim();
+      if (!draftText) {
+        alert("Please enter a student draft sentence before generating feedback.");
+        return;
+      }
+
+      const focus = document.querySelector('input[name="writingFocus"]:checked').value;
+      const apiKey = localStorage.getItem('studio_gemini_key');
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Evaluating Draft...</span>`;
+
+      try {
+        let result = null;
+        if (apiKey) {
+          result = await callGeminiAPI(apiKey, selectedVocab, focus, draftText);
+        } else {
+          result = simulateEngineEvaluation(selectedVocab, focus, draftText);
+        }
+
+        displayEvaluation(result, focus);
+      } catch (err) {
+        console.error(err);
+        alert("Error generating feedback: " + err.message + "\nFalling back to internal logic.");
+        const fallback = simulateEngineEvaluation(selectedVocab, focus, draftText);
+        displayEvaluation(fallback, focus);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Generate 3-Tier AI Feedback</span>`;
+      }
+    }
+
+    // CALL GEMINI API DIRECTLY
+    async function callGeminiAPI(apiKey, vocabList, focus, draft) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: SYSTEM_PROMPT },
+              { text: `1. Target Vocabulary Used: [${vocabList.join(', ')}]\n2. Writing Focus: [${focus}]\n3. Student Draft Sentence: [${draft}]` }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error(`API responded with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      const responseText = data.candidates[0].content.parts[0].text;
+      return JSON.parse(responseText);
+    }
+
+    // LOCAL ENGINE EVALUATION FALLBACK
+    function simulateEngineEvaluation(vocabList, focus, draft) {
+      let correctedDraft = draft.charAt(0).toUpperCase() + draft.slice(1);
+      if (!/[.!?]$/.test(correctedDraft)) correctedDraft += '.';
+      
+      // Basic UK replacements for simulation
+      correctedDraft = correctedDraft
+        .replace(/\borganize\b/g, 'organise')
+        .replace(/\bprogram\b/g, 'programme')
+        .replace(/\bcolor\b/g, 'colour');
+
+      const isZeroError = (draft === correctedDraft);
+      const boldedVocab = vocabList.length > 0 ? vocabList.map(v => `**${v}**`).join(', ') : 'target vocabulary';
+
+      let star1Text = isZeroError 
+        ? `Great job! Your draft has no grammatical errors! ${draft}`
+        : `★ ${correctedDraft}`;
+
+      let star2Text = "";
+      let explain2 = "";
+
+      if (focus === "Better Word Choice") {
+        star2Text = `★★ ${correctedDraft.replace(/\b(good|nice|happy|like)\b/i, boldedVocab || '**confident**')}`;
+        explain2 = `Enhanced basic vocabulary choices with precise, high-level UK expression incorporating selected terms (${boldedVocab}).`;
+      } else {
+        star2Text = `★★ ${correctedDraft.replace(/\.$/, '')}, which helped me develop great school spirit during practice at the sports complex.`;
+        explain2 = `Added contextual details including location, reasons, and specific actions to elaborate on the core idea.`;
+      }
+
+      let star3Text = `★★★ While participating actively in school life, ${correctedDraft.charAt(0).toLowerCase() + correctedDraft.slice(1).replace(/\.$/, '')}, thereby demonstrating exceptional resilience and dedication.`;
+
+      // Highlight target vocab in stars if present
+      vocabList.forEach(term => {
+        const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+        star1Text = star1Text.replace(regex, '**$1**');
+        star2Text = star2Text.replace(regex, '**$1**');
+        star3Text = star3Text.replace(regex, '**$1**');
+      });
+
+      return {
+        star1: star1Text,
+        star2: star2Text,
+        star3: star3Text,
+        explain1: isZeroError ? "The student draft contained zero grammatical, punctuation, or spelling errors." : "Corrected capitalization, UK spelling conventions, and standard sentence punctuation.",
+        explain2: explain2,
+        explain3: "Restructured the sentence using a complex subordinate clause structure with sophisticated transitional expressions for master polish."
+      };
+    }
+
+    // DISPLAY RESULTS
+    function displayEvaluation(data, focus) {
+      currentEvaluation = {
+        timestamp: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        rawDraft: document.getElementById('studentDraftInput').value,
+        focus: focus,
+        vocab: [...selectedVocab],
+        data: data
+      };
+
+      document.getElementById('outputPlaceholder').classList.add('hidden');
+      document.getElementById('feedbackContainer').classList.remove('hidden');
+
+      document.getElementById('star1-text').innerHTML = formatMarkdownBold(data.star1);
+      document.getElementById('explain1-text').innerText = data.explain1;
+
+      document.getElementById('star2-badge-focus').innerText = `Targeted Upgrade: ${focus}`;
+      document.getElementById('star2-text').innerHTML = formatMarkdownBold(data.star2);
+      document.getElementById('explain2-text').innerText = data.explain2;
+
+      document.getElementById('star3-text').innerHTML = formatMarkdownBold(data.star3);
+      document.getElementById('explain3-text').innerText = data.explain3;
+    }
+
+    function formatMarkdownBold(str) {
+      return str.replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-700 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-100">$1</strong>');
+    }
+
+    // SAVE TO PORTFOLIO
+    function saveToPortfolio() {
+      if (!currentEvaluation) return;
+      portfolioEntries.unshift({...currentEvaluation});
+      updatePortfolioUI();
+      alert("Profile entry saved to your portfolio!");
+    }
+
+    function updatePortfolioUI() {
+      document.getElementById('portfolioCount').innerText = portfolioEntries.length;
+      const list = document.getElementById('portfolioList');
+
+      if (portfolioEntries.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+            <p class="text-xs text-slate-400">Your saved portfolio is empty. Evaluate and save entries from the Drafting Studio.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = portfolioEntries.map((item, index) => `
+        <div class="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+          <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.timestamp}</span>
+              <h4 class="font-bold text-sm text-slate-800">Original Draft: "${item.rawDraft}"</h4>
+              <div class="flex flex-wrap gap-1 mt-1">
+                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">Focus: ${item.focus}</span>
+                ${item.vocab.map(v => `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-medium">${v}</span>`).join('')}
+              </div>
+            </div>
+            <button onclick="deletePortfolioEntry(${index})" class="text-slate-300 hover:text-red-500 text-xs p-1">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-amber-50/40 p-3 rounded-xl border border-amber-100">
+              <span class="text-[10px] font-bold text-amber-600 block mb-1">★ ONE STAR</span>
+              <p class="text-xs text-slate-700 leading-relaxed">${formatMarkdownBold(item.data.star1)}</p>
+            </div>
+            <div class="bg-indigo-50/40 p-3 rounded-xl border border-indigo-100">
+              <span class="text-[10px] font-bold text-indigo-600 block mb-1">★★ TWO STARS</span>
+              <p class="text-xs text-slate-700 leading-relaxed">${formatMarkdownBold(item.data.star2)}</p>
+            </div>
+            <div class="bg-emerald-50/40 p-3 rounded-xl border border-emerald-100">
+              <span class="text-[10px] font-bold text-emerald-600 block mb-1">★★★ THREE STARS</span>
+              <p class="text-xs text-slate-700 leading-relaxed">${formatMarkdownBold(item.data.star3)}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deletePortfolioEntry(index) {
+      portfolioEntries.splice(index, 1);
+      updatePortfolioUI();
+    }
+
+    // SPEECH SYNTHESIS (TTS)
+    function speakText(starId) {
+      if (!currentEvaluation) return;
+      const text = currentEvaluation.data[starId];
+      speakDirect(text);
+    }
+
+    function speakDirect(rawText) {
+      if (!('speechSynthesis' in window)) {
+        alert("Text-to-speech is not supported in your browser.");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      
+      // Clean markdown asterisks and star prefixes
+      const cleanText = rawText
+        .replace(/\*\*/g, '')
+        .replace(/^[★\s]+/, '');
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'en-GB';
+
+      const voices = window.speechSynthesis.getVoices();
+      const ukVoice = voices.find(v => v.lang.includes('en-GB') || v.lang.includes('en_GB'));
+      if (ukVoice) utterance.voice = ukVoice;
+
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
